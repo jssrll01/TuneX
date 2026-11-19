@@ -101,7 +101,7 @@ E('limit','Limiter',Y,-12,0,1,-3,' dB',LM),
 E('gate','Noise gate',Y,-70,-20,1,-50,' dB',NG),
 E('boost','Mic boost',Y,-12,18,1,6,' dB',BO)
 ];
-var GR=[T,C,P,M,D,S_,Y];
+var GR=['Active',T,C,P,M,D,S_,Y];
 var PRE={'Studio':{lowcut:90,demud:.4,presence:.5,air:.4,deess:.4,comp:.5,room:.25},'Stage':{lowcut:100,warmth:.4,presence:.4,comp:.6,chorus:.3,hall:.4,echo:.2},'Radio DJ':{bass:.5,presence:.5,comp:.8,limit:-3},'Robot':{robot:60,room:.15},'Monster':{monster:7,cave:.4},'Chipmunk':{chip:7},'Phone':{phone:.5},'Alien':{alien:450,pong:.3},'Choir':{cathedral:.5,chorus:.4,harm:7}};
 /* state */
 var S;try{S=JSON.parse(localStorage.getItem('tunex.fx'))||{}}catch(e){S={}}
@@ -120,9 +120,9 @@ src.disconnect=function(){try{ch.out.disconnect()}catch(e){}try{nd()}catch(e){}}
 live=ch;apply();return src};
 /* UI */
 var css='.fxfab{position:fixed;left:12px;bottom:12px;z-index:9998;border:0;border-radius:99px;padding:10px 16px;font:700 14px Inter,sans-serif;background:var(--accent,#7c3aed);color:#fff;box-shadow:0 6px 20px #0004}.fxsheet{position:fixed;top:0;bottom:0;right:0;width:min(440px,100vw);z-index:9999;background:var(--card,#fff);color:var(--ink,#14151f);overflow:auto;padding:12px 14px calc(16px + env(safe-area-inset-bottom));box-shadow:-8px 0 30px #0004;font:500 13px Inter,sans-serif}.fxhd{display:flex;justify-content:space-between;align-items:center;font-size:16px;margin-bottom:8px}.fxhd button,.fxrow button{border:1px solid var(--line,#e8eaf3);background:var(--bg,#f4f5fa);color:inherit;border-radius:99px;padding:6px 12px;margin:2px;font:600 12px Inter,sans-serif}.fxrow{display:flex;flex-wrap:wrap;margin-bottom:6px}.fxrow button.act{background:var(--accent,#7c3aed);color:#fff}.fxit{display:grid;grid-template-columns:1fr 1.2fr 56px;gap:8px;align-items:center;padding:8px 6px;border-bottom:1px solid var(--line,#e8eaf3)}.fxit.on{background:color-mix(in srgb,var(--accent,#7c3aed) 10%,transparent);border-radius:10px}.fxit label{display:flex;gap:8px;align-items:center;font-weight:600}.fxit input[type=range]{width:100%;accent-color:var(--accent,#7c3aed)}.fxit em{font-style:normal;color:var(--mute,#6b7085);font-size:11px;text-align:right}.fxnote{color:var(--mute,#6b7085);font-size:11px;margin-top:10px}';
-function gc(g){return FX.filter(function(f){return f.g===g&&S.on[f.id]}).length}
+function gc(g){return FX.filter(function(f){return (g==='Active'||f.g===g)&&S.on[f.id]}).length}
 function App(){
-var a=useState(false),open=a[0],setOpen=a[1],b=useState(GR[0]),tab=b[0],setTab=b[1],t=useState(0);
+var a=useState(false),open=a[0],setOpen=a[1],b=useState(GR[1]),tab=b[0],setTab=b[1],t=useState(0);
 var re=function(){t[1](function(x){return x+1})};
 var n=FX.filter(function(f){return S.on[f.id]}).length;
 function reset(){S.on={};S.val={};S.preset=null;save();apply();re()}
@@ -131,9 +131,9 @@ return h`<div>
 <button className="fxfab" onClick=${function(){setOpen(!open)}}>FX${n?' · '+n:''}</button>
 ${open&&h`<div className="fxsheet">
 <div className="fxhd"><b>Voice FX · 50 effects${n?' · '+n+' on':''}</b><span><button onClick=${reset}>Reset</button></span></div>
-<div className="fxrow">${Object.keys(PRE).map(function(k){return h`<button key=${k} className=${S.preset===k?'act':''} onClick=${function(){preset(k)}}>${k}</button>`})}</div>
+<div className="fxrow">${Object.keys(PRE).map(function(k){return h`<button key=${k} className=${S.preset===k?'act':''} onClick=${function(){preset(k)}}>${k} · ${Object.keys(PRE[k]).length}</button>`})}</div>
 <div className="fxrow">${GR.map(function(g){return h`<button key=${g} className=${g===tab?'act':''} onClick=${function(){setTab(g)}}>${g}${gc(g)?' · '+gc(g):''}</button>`})}</div>
-${FX.filter(function(f){return f.g===tab}).map(function(f){return h`<div key=${f.id} className=${'fxit'+(S.on[f.id]?' on':'')}>
+${FX.filter(function(f){return tab==='Active'?!!S.on[f.id]:f.g===tab}).map(function(f){return h`<div key=${f.id} className=${'fxit'+(S.on[f.id]?' on':'')}>
 <label><input type="checkbox" checked=${!!S.on[f.id]} onChange=${function(e){S.on[f.id]=e.target.checked;S.preset=null;save();apply();re()}}/><span>${f.name}</span></label>
 <input type="range" min=${f.min} max=${f.max} step=${f.step} value=${val(f)} onInput=${function(e){S.val[f.id]=+e.target.value;S.on[f.id]=true;S.preset=null;save();apply();re()}}/>
 <em>${val(f)}${f.unit}</em></div>`})}
