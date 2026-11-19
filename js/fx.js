@@ -129,7 +129,7 @@ function preset(k){S.on={};S.val={};var p=PRE[k];for(var id in p){S.on[id]=true;
 return h`<div>
 <button className="fxfab" onClick=${function(){setOpen(!open)}}>FX${n?' · '+n:''}</button>
 ${open&&h`<div className="fxsheet">
-<div className="fxhd"><b>Voice FX · 50 effects</b><span><button onClick=${reset}>Reset</button><button onClick=${function(){setOpen(false)}}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></span></div>
+<div className="fxhd"><b>Voice FX · 50 effects</b><span><button onClick=${reset}>Reset</button></span></div>
 <div className="fxrow">${Object.keys(PRE).map(function(k){return h`<button key=${k} onClick=${function(){preset(k)}}>${k}</button>`})}</div>
 <div className="fxrow">${GR.map(function(g){return h`<button key=${g} className=${g===tab?'act':''} onClick=${function(){setTab(g)}}>${g}</button>`})}</div>
 ${FX.filter(function(f){return f.g===tab}).map(function(f){return h`<div key=${f.id} className=${'fxit'+(S.on[f.id]?' on':'')}>

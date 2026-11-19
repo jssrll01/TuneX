@@ -205,7 +205,7 @@ return h`<div>
 ${S.v.clock&&h`<div className="stclock">${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>`}
 ${msg&&h`<div className="sttoast">${msg}</div>`}
 ${open&&h`<div className="stsheet">
-<div className="sthd"><b>Studio</b><span><button onClick=${resetAll}>Reset</button><button onClick=${()=>setOpen(false)}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></span></div>
+<div className="sthd"><b>Studio</b><span><button onClick=${resetAll}>Reset</button></span></div>
 <div className="strow"><button className=${mode==='c'?'act':''} onClick=${()=>setMode('c')}>Controls · 50</button><button className=${mode==='u'?'act':''} onClick=${()=>setMode('u')}>Customize · 50</button></div>
 <div className="strow">${groups.map(x=>h`<button key=${x} className=${x===g?'act':''} onClick=${()=>setG(x)}>${x}</button>`)}</div>
 ${mode==='c'&&h`<div className="ststat">${stat()}</div><div className="stgrid">${CT.filter(i=>i.g===g).map(ctl)}</div>`}

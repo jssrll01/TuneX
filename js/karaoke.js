@@ -156,7 +156,7 @@ ${o.curtains&&h`<div><i className="kxcur l"/><i className="kxcur r"/></div>`}
 </div>
 <button className="kxfab" onClick=${()=>setOpen(!open)}>Karaoke</button>
 ${open&&h`<div className="kxsheet">
-<div className="kxhd"><b>Karaoke · 50 effects</b><span><button onClick=${()=>preset('Off')}>Stop all</button><button onClick=${()=>setOpen(false)}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></span></div>
+<div className="kxhd"><b>Karaoke · 50 effects</b><span><button onClick=${()=>preset('Off')}>Stop all</button></span></div>
 <div className="kxrow">${['Party','Concert','Chill'].map(k=>h`<button key=${k} onClick=${()=>preset(k)}>${k} mode</button>`)}</div>
 <div className="kxset"><span>SFX vol</span><input type="range" min="0" max="1" step=".05" value=${S.vol} onInput=${e=>{S.vol=+e.target.value;if(AX.m)AX.m.gain.value=S.vol;save();re()}}/><em>${Math.round(S.vol*100)}%</em></div>
 <div className="kxset"><span>BPM</span><input type="range" min="60" max="200" step="1" value=${S.bpm} onInput=${e=>{S.bpm=+e.target.value;save();re()}}/><em>${S.bpm}</em></div>

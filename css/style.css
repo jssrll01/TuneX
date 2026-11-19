@@ -147,3 +147,10 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 
 /* hide the old floating buttons everywhere (tabs in the sidebar replace them) */
 .fxfab,.stfab,.kxfab{display:none!important}
+
+/* panels: always on top and tappable */
+body .fxsheet,body .stsheet,body .kxsheet{z-index:2147483000!important;pointer-events:auto!important;touch-action:manipulation;-webkit-overflow-scrolling:touch}
+body .fxsheet *,body .stsheet *,body .kxsheet *{pointer-events:auto!important}
+.fxsheet input[type=range],.stsheet input[type=range],.kxsheet input[type=range]{touch-action:pan-x;min-height:28px}
+.fxsheet button,.stsheet button,.kxsheet button,.fxsheet label,.stsheet label{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.kxl,.kxcv{pointer-events:none!important}
