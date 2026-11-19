@@ -120,21 +120,22 @@ src.disconnect=function(){try{ch.out.disconnect()}catch(e){}try{nd()}catch(e){}}
 live=ch;apply();return src};
 /* UI */
 var css='.fxfab{position:fixed;left:12px;bottom:12px;z-index:9998;border:0;border-radius:99px;padding:10px 16px;font:700 14px Inter,sans-serif;background:var(--accent,#7c3aed);color:#fff;box-shadow:0 6px 20px #0004}.fxsheet{position:fixed;top:0;bottom:0;right:0;width:min(440px,100vw);z-index:9999;background:var(--card,#fff);color:var(--ink,#14151f);overflow:auto;padding:12px 14px calc(16px + env(safe-area-inset-bottom));box-shadow:-8px 0 30px #0004;font:500 13px Inter,sans-serif}.fxhd{display:flex;justify-content:space-between;align-items:center;font-size:16px;margin-bottom:8px}.fxhd button,.fxrow button{border:1px solid var(--line,#e8eaf3);background:var(--bg,#f4f5fa);color:inherit;border-radius:99px;padding:6px 12px;margin:2px;font:600 12px Inter,sans-serif}.fxrow{display:flex;flex-wrap:wrap;margin-bottom:6px}.fxrow button.act{background:var(--accent,#7c3aed);color:#fff}.fxit{display:grid;grid-template-columns:1fr 1.2fr 56px;gap:8px;align-items:center;padding:8px 6px;border-bottom:1px solid var(--line,#e8eaf3)}.fxit.on{background:color-mix(in srgb,var(--accent,#7c3aed) 10%,transparent);border-radius:10px}.fxit label{display:flex;gap:8px;align-items:center;font-weight:600}.fxit input[type=range]{width:100%;accent-color:var(--accent,#7c3aed)}.fxit em{font-style:normal;color:var(--mute,#6b7085);font-size:11px;text-align:right}.fxnote{color:var(--mute,#6b7085);font-size:11px;margin-top:10px}';
+function gc(g){return FX.filter(function(f){return f.g===g&&S.on[f.id]}).length}
 function App(){
 var a=useState(false),open=a[0],setOpen=a[1],b=useState(GR[0]),tab=b[0],setTab=b[1],t=useState(0);
 var re=function(){t[1](function(x){return x+1})};
 var n=FX.filter(function(f){return S.on[f.id]}).length;
-function reset(){S.on={};S.val={};save();apply();re()}
-function preset(k){S.on={};S.val={};var p=PRE[k];for(var id in p){S.on[id]=true;S.val[id]=p[id]}save();apply();re()}
+function reset(){S.on={};S.val={};S.preset=null;save();apply();re()}
+function preset(k){S.on={};S.val={};var p=PRE[k],first=null;for(var id in p){S.on[id]=true;S.val[id]=p[id];if(!first)first=id}S.preset=k;save();apply();var ff=FX.filter(function(x){return x.id===first})[0];if(ff)setTab(ff.g);re()}
 return h`<div>
 <button className="fxfab" onClick=${function(){setOpen(!open)}}>FX${n?' · '+n:''}</button>
 ${open&&h`<div className="fxsheet">
-<div className="fxhd"><b>Voice FX · 50 effects</b><span><button onClick=${reset}>Reset</button></span></div>
-<div className="fxrow">${Object.keys(PRE).map(function(k){return h`<button key=${k} onClick=${function(){preset(k)}}>${k}</button>`})}</div>
-<div className="fxrow">${GR.map(function(g){return h`<button key=${g} className=${g===tab?'act':''} onClick=${function(){setTab(g)}}>${g}</button>`})}</div>
+<div className="fxhd"><b>Voice FX · 50 effects${n?' · '+n+' on':''}</b><span><button onClick=${reset}>Reset</button></span></div>
+<div className="fxrow">${Object.keys(PRE).map(function(k){return h`<button key=${k} className=${S.preset===k?'act':''} onClick=${function(){preset(k)}}>${k}</button>`})}</div>
+<div className="fxrow">${GR.map(function(g){return h`<button key=${g} className=${g===tab?'act':''} onClick=${function(){setTab(g)}}>${g}${gc(g)?' · '+gc(g):''}</button>`})}</div>
 ${FX.filter(function(f){return f.g===tab}).map(function(f){return h`<div key=${f.id} className=${'fxit'+(S.on[f.id]?' on':'')}>
-<label><input type="checkbox" checked=${!!S.on[f.id]} onChange=${function(e){S.on[f.id]=e.target.checked;save();apply();re()}}/><span>${f.name}</span></label>
-<input type="range" min=${f.min} max=${f.max} step=${f.step} value=${val(f)} onInput=${function(e){S.val[f.id]=+e.target.value;S.on[f.id]=true;save();apply();re()}}/>
+<label><input type="checkbox" checked=${!!S.on[f.id]} onChange=${function(e){S.on[f.id]=e.target.checked;S.preset=null;save();apply();re()}}/><span>${f.name}</span></label>
+<input type="range" min=${f.min} max=${f.max} step=${f.step} value=${val(f)} onInput=${function(e){S.val[f.id]=+e.target.value;S.on[f.id]=true;S.preset=null;save();apply();re()}}/>
 <em>${val(f)}${f.unit}</em></div>`})}
 <p className="fxnote">Start the mic first, then toggle effects live. Use headphones to avoid feedback.</p>
 </div>`}
