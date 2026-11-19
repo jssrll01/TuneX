@@ -111,12 +111,13 @@ const Mic = {
     bass.type = 'lowshelf'; bass.frequency.value = 200;
     treble.type = 'highshelf'; treble.frequency.value = 3500;
     ana.fftSize = 1024;
-    src.connect(hp); hp.connect(bass); bass.connect(treble); treble.connect(comp); comp.connect(master);
+    const eqf = [60, 170, 310, 600, 1000, 3000, 6000, 12000].map((f) => { const b = ctx.createBiquadFilter(); b.type = 'peaking'; b.frequency.value = f; b.Q.value = 1.1; return b; });
+    src.connect(hp); hp.connect(bass); bass.connect(treble); eqf.reduce((a, b) => { a.connect(b); return b; }, treble).connect(comp); comp.connect(master);
     comp.connect(echoSend); echoSend.connect(delay); delay.connect(fb); fb.connect(delay); delay.connect(master);
     comp.connect(revSend); revSend.connect(conv); conv.connect(master);
     master.connect(ana); ana.connect(mon); mon.connect(ctx.destination);
     this.ctx = ctx; this.stream = stream;
-    this.n = { master, echoSend, delay, fb, revSend, conv, bass, treble, mon, ana, buf: new Float32Array(ana.fftSize) };
+    this.n = { master, echoSend, delay, fb, revSend, conv, bass, treble, eqf, mon, ana, buf: new Float32Array(ana.fftSize) };
   },
   stop() {
     try { if (this.stream) this.stream.getTracks().forEach((t) => t.stop()); } catch (e) {}
@@ -128,7 +129,7 @@ const Mic = {
     const t = this.ctx.currentTime, s = (p, v) => p.setTargetAtTime(v, t, 0.03);
     s(n.master.gain, fx.vol); s(n.echoSend.gain, fx.echo); s(n.delay.delayTime, fx.echoTime);
     s(n.fb.gain, Math.min(0.6, 0.2 + fx.echo * 0.6)); s(n.revSend.gain, fx.reverb * 1.4);
-    s(n.bass.gain, fx.bass); s(n.treble.gain, fx.treble); s(n.mon.gain, fx.monitor ? 1 : 0);
+    s(n.bass.gain, fx.bass); s(n.treble.gain, fx.treble); n.eqf.forEach((b, i) => s(b.gain, (fx.eq && fx.eq[i]) || 0)); s(n.mon.gain, fx.monitor ? 1 : 0);
   },
   room(sec) {
     if (!this.n) return;
@@ -275,8 +276,9 @@ function enterFull() {
 }
 
 /* ---------- search pane ---------- */
-function SearchPane({ apiKey, kOnly, setK, recent, pushRecent, clearRecent, A }) {
+function SearchPane({ apiKey, kOnly, setK, recent, pushRecent, clearRecent, A: A0 }) {
   const [q, setQ] = useState(''), [items, setItems] = useState([]), [next, setNext] = useState(''), [busy, setBusy] = useState(false), [err, setErr] = useState('');
+  const A = Object.assign({}, A0, { play: (s) => { setQ(''); return A0.play(s); }, add: (s) => { setQ(''); return A0.add(s); }, playNext: (s) => { setQ(''); return A0.playNext(s); } });
   const run = async (text, more) => {
     const raw = (text == null ? q : text).trim(); if (!raw) return;
     if (text != null) setQ(text);
@@ -644,13 +646,15 @@ function App({ apiKey, onResetKey }) {
           <${Switch} on=${mic.monitor} onClick=${() => setMic({ monitor: !mic.monitor })} label="Hear my voice" desc="Monitor the mic in your headphones" />
           <div className="h">Voice presets</div>
           <div className="chips">${Object.keys(PRESETS).map((n) => html`<button key=${n} className=${'pill' + (mic.preset === n ? ' on' : '')} onClick=${() => setMic(Object.assign({ preset: n }, PRESETS[n]))}>${n}</button>`)}</div>
-          <${Slider} label="Mic volume" value=${mic.vol} min=${0} max=${1.5} step=${0.05} onChange=${(v) => setMic({ vol: v, preset: '' })} />
+          <${Slider} label="Mic volume (1 = 100%, 10 = 1000%)" value=${mic.vol} min=${0} max=${10} step=${0.1} unit="x" onChange=${(v) => setMic({ vol: v, preset: '' })} />
           <${Slider} label="Echo" value=${mic.echo} min=${0} max=${0.9} step=${0.05} onChange=${(v) => setMic({ echo: v, preset: '' })} />
           <${Slider} label="Echo time" value=${mic.echoTime} min=${0.05} max=${0.9} step=${0.05} unit="s" onChange=${(v) => setMic({ echoTime: v, preset: '' })} />
           <${Slider} label="Reverb" value=${mic.reverb} min=${0} max=${1} step=${0.05} onChange=${(v) => setMic({ reverb: v, preset: '' })} />
           <${Slider} label="Room size" value=${mic.size} min=${0.5} max=${4} step=${0.1} unit="s" onChange=${(v) => setMic({ size: v, preset: '' })} />
           <${Slider} label="Bass" value=${mic.bass} min=${-10} max=${10} unit=" dB" onChange=${(v) => setMic({ bass: v, preset: '' })} />
           <${Slider} label="Treble" value=${mic.treble} min=${-10} max=${10} unit=" dB" onChange=${(v) => setMic({ treble: v, preset: '' })} />
+          <div className="h">Equaliser</div>
+          ${[60, 170, 310, 600, 1000, 3000, 6000, 12000].map((f, i) => html`<${Slider} key=${'eq' + i} label=${f >= 1000 ? (f / 1000) + ' kHz' : f + ' Hz'} value=${(mic.eq && mic.eq[i]) || 0} min=${-12} max=${12} unit=" dB" onChange=${(v) => { const e = (mic.eq || [0, 0, 0, 0, 0, 0, 0, 0]).slice(); e[i] = v; setMic({ eq: e, preset: '' }); }} />`)}
         </section>
 
         <section className=${'pane' + (tab === 'look' ? ' on' : '')}>
