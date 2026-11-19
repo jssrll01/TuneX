@@ -378,7 +378,15 @@ function App({ apiKey, onResetKey }) {
     const sc = calcScore();
     if (sc != null && Mic.ctx) toast('Song finished · Sing score ' + sc + ' (' + grade(sc) + ')');
     if (R.current.st.repeat === 'one') { restart(); scoreRef.current = { n: 0, a: 0 }; return; }
-    if (R.current.st.autoplay) { const j = nextIndex(); if (j >= 0) playIndex(j); }
+    if (R.current.st.repeat === 'all') { if (R.current.st.autoplay) { const j = nextIndex(); if (j >= 0) playIndex(j); } return; }
+    const { queue: q, idx: i } = R.current;
+    if (i < 0 || !q[i]) return;
+    const j = R.current.st.autoplay ? nextIndex() : -1;
+    const nextSong = j >= 0 ? q[j] : null;
+    const nq = q.filter((_, k) => k !== i);
+    setQueue(nq);
+    if (nextSong) { setIdx(nq.indexOf(nextSong)); setToken((t) => t + 1); }
+    else setIdx(-1);
   };
   H.current = {
     state: (s) => {
