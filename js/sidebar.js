@@ -42,7 +42,7 @@ list.forEach(function(n){if(n.nodeValue.trim()===tn)n.nodeValue=t.label});
 el.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();toggle(t)});
 bar.appendChild(el);ours[t.id]=el});
 if(!bar.__sbx){bar.__sbx=1;bar.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('.sbx'))return;closeAll();setTimeout(sync,60)},true)}
-bar.style.overflowX='auto';bar.style.scrollbarWidth='none';
+bar.classList.add('sbx-bar');bar.style.overflowX='auto';bar.style.scrollbarWidth='none';
 document.body.classList.add('sbx-ok')}
 function ensure(){
 var ok=bar&&bar.isConnected&&TABS.every(function(t){return ours[t.id]&&ours[t.id].isConnected});
