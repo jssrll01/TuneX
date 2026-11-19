@@ -3,8 +3,6 @@
 var SV='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">';
 var TABS=[
 {id:'fx',label:'FX',fab:'.fxfab',sheet:'.fxsheet',icon:SV+'<path d="M2 13a2 2 0 0 0 2-2V7a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0V4a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0v-4a2 2 0 0 1 2-2"/></svg>'},
-{id:'studio',label:'Studio',fab:'.stfab',sheet:'.stsheet',icon:SV+'<path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></svg>'},
-{id:'karaoke',label:'Karaoke',fab:'.kxfab',sheet:'.kxsheet',icon:SV+'<path d="M9.94 15.5A2 2 0 0 0 8.5 14.06l-6.14-1.58a.5.5 0 0 1 0-.96L8.5 9.94A2 2 0 0 0 9.94 8.5l1.58-6.14a.5.5 0 0 1 .96 0L14.06 8.5a2 2 0 0 0 1.44 1.44l6.14 1.58a.5.5 0 0 1 0 .96L15.5 14.06a2 2 0 0 0-1.44 1.44l-1.58 6.14a.5.5 0 0 1-.96 0z"/><path d="M20 3v4M22 5h-4M4 17v2M5 18H3"/></svg>'}
 ];
 var NAMES=['Search','Queue','Saved','Mic','Look','More'];
 var css='body.sbx-ok .fxfab,body.sbx-ok .stfab,body.sbx-ok .kxfab{display:none!important}'
