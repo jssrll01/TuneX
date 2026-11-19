@@ -6,15 +6,16 @@ const KEY='tunex.studio',ORIG=document.title;
 let S;try{S=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){S={}}
 S.t=S.t||{};S.v=S.v||{};
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
-/* capture the YouTube player */
+/* control the YouTube player through its iframe (no patching) */
 let PL=null;
-function patchYT(){const Y=window.YT;if(!Y||!Y.Player||Y.Player.__tx)return;const O=Y.Player;
-const N=function(a,b){const p=new O(a,b);PL=p;return p};N.prototype=O.prototype;N.__tx=1;
-Object.keys(O).forEach(k=>{try{N[k]=O[k]}catch(e){}});Y.Player=N}
-(function(){if(window.YT&&window.YT.Player){patchYT();return}
-let cur=window.onYouTubeIframeAPIReady;
-const wrapped=function(){patchYT();if(typeof cur==='function')return cur.apply(this,arguments)};
-Object.defineProperty(window,'onYouTubeIframeAPIReady',{configurable:true,get(){return wrapped},set(f){cur=f}})})();
+const IFR=()=>document.querySelector('iframe[src*="youtube"]');
+const YI={};
+const ytc=(f,a)=>{const i=IFR();if(i&&i.contentWindow)i.contentWindow.postMessage(JSON.stringify({event:'command',func:f,args:a||[]}),'*')};
+addEventListener('message',e=>{if(String(e.origin).indexOf('youtube')<0)return;let d=e.data;if(typeof d==='string'){try{d=JSON.parse(d)}catch(x){return}}if(!d)return;if(d.event==='infoDelivery'&&d.info)Object.assign(YI,d.info);else if(d.event==='onStateChange')YI.playerState=d.info});
+const SHIM={getPlayerState:()=>YI.playerState==null?-1:YI.playerState,getCurrentTime:()=>YI.currentTime||0,getDuration:()=>YI.duration||0,getVolume:()=>YI.volume==null?100:YI.volume,getPlaybackRate:()=>YI.playbackRate||1,isMuted:()=>!!YI.muted};
+['playVideo','pauseVideo','mute','unMute'].forEach(n=>{SHIM[n]=()=>ytc(n)});
+SHIM.seekTo=(t,b)=>ytc('seekTo',[t,b]);SHIM.setVolume=v=>ytc('setVolume',[v]);SHIM.setPlaybackRate=r=>ytc('setPlaybackRate',[r]);
+setInterval(()=>{const i=IFR();if(i&&i.contentWindow){PL=SHIM;i.contentWindow.postMessage(JSON.stringify({event:'listening',id:1,channel:'widget'}),'*')}else PL=null},1000);
 /* helpers */
 const bus=new Set();let msg='';
 const toast=m=>{msg=m;bus.forEach(f=>f());setTimeout(()=>{if(msg===m){msg='';bus.forEach(f=>f())}},2200)};
