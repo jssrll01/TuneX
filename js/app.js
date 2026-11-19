@@ -586,7 +586,7 @@ function App({ apiKey, onResetKey }) {
             <div className="grp">
               <button className=${'ib' + (st.shuffle ? ' on' : '')} onClick=${() => set('shuffle', !st.shuffle)} aria-label="Shuffle" title="Shuffle">${I('shuffle', 19)}</button>
               <button className=${'ib' + (st.repeat !== 'off' ? ' on' : '')} onClick=${() => set('repeat', st.repeat === 'off' ? 'all' : st.repeat === 'all' ? 'one' : 'off')} aria-label="Repeat" title=${'Repeat: ' + st.repeat}>${I('repeat', 19)}</button>
-              <button className=${'ib txt' + (loopAB.a != null ? ' on' : '')} onClick=${cycleLoop} aria-label="A-B loop" title="A-B loop">${loopAB.a == null ? 'A-B' : loopAB.b == null ? 'A..' : 'A-B ✓'}</button>
+              <button className=${'ib txt' + (loopAB.a != null ? ' on' : '')} onClick=${cycleLoop} aria-label="A-B loop" title="A-B loop">${loopAB.a == null ? 'A-B' : loopAB.b == null ? 'A..' : 'A-B on'}</button>
             </div>
             <div className="grp">
               <button className="ib" onClick=${prev} aria-label="Previous" title="Previous">${I('prev', 21)}</button>
